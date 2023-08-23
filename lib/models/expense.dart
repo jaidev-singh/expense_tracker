@@ -8,11 +8,18 @@ const uuid = Uuid();
 
 enum Category { food, travel, leisure, work }
 
-const categoryIcons = {
-  Category.food: Icons.lunch_dining,
-  Category.travel: Icons.flight_takeoff,
-  Category.leisure: Icons.movie,
-  Category.work: Icons.work,
+const List<IconData> iconList = [
+  Icons.lunch_dining,
+  Icons.flight_takeoff,
+  Icons.movie,
+  Icons.work
+];
+
+final categoryIcons = {
+  Category.food: iconList[0],
+  Category.travel: iconList[1],
+  Category.leisure: iconList[2],
+  Category.work: iconList[3],
 };
 
 class Expense {

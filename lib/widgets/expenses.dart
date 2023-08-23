@@ -1,6 +1,7 @@
-import 'package:expense_tracker/widgets/new_expense.dart';
 import 'package:flutter/material.dart';
 
+import 'package:expense_tracker/bars/bar_chart.dart';
+import 'package:expense_tracker/widgets/new_expense.dart';
 import 'package:expense_tracker/widgets/expenses_list/expenses_list.dart';
 import 'package:expense_tracker/models/expense.dart';
 
@@ -87,8 +88,10 @@ class _ExpensesState extends State<Expenses> {
       ),
       body: Column(
         children: [
-          const Text('The chart'),
+          const SizedBox(height: 10),
+          BarGraph(totalExpenses: _registeredExpenses),
           Expanded(
+            flex: 2,
             child: mainContent,
           )
         ],
