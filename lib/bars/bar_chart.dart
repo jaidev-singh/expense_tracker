@@ -57,6 +57,9 @@ class BarGraph extends StatelessWidget {
     return Expanded(
       child: BarChart(
         BarChartData(
+          // put right title near to last bar
+          alignment: BarChartAlignment.spaceAround,
+          //groupsSpace: 20.0,
           minY: 0,
           maxY: (maxValue / 10).ceil() * 10,
           gridData: const FlGridData(show: false), // remove grids

@@ -80,90 +80,177 @@ class _NewExpenseState extends State<NewExpense> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),
-      child: Column(
+    final keyboardSpace = MediaQuery.of(context).viewInsets.bottom;
+    // LayoutBuilder give us the constraints applied by parent
+    // this function is called when constraints change
+    return LayoutBuilder(builder: (ctx, constraints) {
+      final width = constraints.maxWidth;
+      // title widget
+      final titleWidget = TextField(
+        controller: _titleController,
+        maxLength: 50,
+        decoration: const InputDecoration(
+          label: Text('Title'),
+        ),
+      );
+
+      // amount widget
+      final amountWidget = Expanded(
+        child: TextField(
+          controller: _amountController,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(
+            prefixText: '\$ ',
+            label: Text('Amount'),
+          ),
+        ),
+      );
+
+      // category widget
+      final categoryWidget = DropdownButton(
+        value: _selectedCategory,
+        items: Category.values
+            .map(
+              (category) => DropdownMenuItem(
+                value: category,
+                child: Text(
+                  category.name.toUpperCase(),
+                ),
+              ),
+            )
+            .toList(),
+        onChanged: (value) {
+          if (value == null) {
+            return;
+          }
+          setState(() {
+            _selectedCategory = value;
+          });
+        },
+      );
+
+      // date widget
+      final dateWidget = Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          TextField(
-            controller: _titleController,
-            maxLength: 50,
-            decoration: const InputDecoration(
-              label: Text('Title'),
+          Text(
+            _selectedDate == null
+                ? 'No date selected'
+                : formatter.format(_selectedDate!),
+          ),
+          IconButton(
+            onPressed: _presentDatePicker,
+            icon: const Icon(
+              Icons.calendar_month,
             ),
           ),
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _amountController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    prefixText: '\$ ',
-                    label: Text('Amount'),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+        ],
+      );
+
+      // cancel button
+      final cancelButton = TextButton(
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        child: const Text('Cancel'),
+      );
+
+      // save button
+      final saveButton = ElevatedButton(
+        onPressed: _submitExpenseData,
+        child: const Text('Save Expense'),
+      );
+
+      // return statement
+      return SizedBox(
+        height: double.infinity,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(16, 16, 16, keyboardSpace + 16),
+            child: Column(
+              children: [
+                // for landscape orientation
+                if (width >= 600)
+                  // first row
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(child: titleWidget),
+                      const SizedBox(width: 24),
+                      amountWidget,
+                    ],
+                  )
+
+                // for potraint orientation
+                else
+                  titleWidget,
+
+                // second row
+                Row(
                   children: [
-                    Text(
-                      _selectedDate == null
-                          ? 'No date selected'
-                          : formatter.format(_selectedDate!),
-                    ),
-                    IconButton(
-                      onPressed: _presentDatePicker,
-                      icon: const Icon(
-                        Icons.calendar_month,
-                      ),
-                    ),
+                    // for landscape orientation
+                    if (width >= 600)
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            categoryWidget,
+                            const SizedBox(width: 48),
+
+                            dateWidget,
+                            const SizedBox(width: 24),
+                            Expanded(
+                                child: Row(
+                              children: [
+                                const Spacer(),
+                                cancelButton,
+                                saveButton
+                              ],
+                            )),
+                            //cancelButton,
+                            //saveButton,
+                          ],
+                        ),
+                      )
+                    // for potrait orientation
+                    else
+                      Expanded(
+                          child: Row(
+                        children: [amountWidget, dateWidget],
+                      )),
                   ],
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              DropdownButton(
-                value: _selectedCategory,
-                items: Category.values
-                    .map(
-                      (category) => DropdownMenuItem(
-                        value: category,
-                        child: Text(
-                          category.name.toUpperCase(),
+                const SizedBox(height: 16),
+                // third row
+                Row(
+                  children: [
+                    if (width >= 600)
+                      const Text('')
+                    else
+                      Expanded(
+                        child: Row(
+                          children: [
+                            categoryWidget,
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  const Spacer(),
+                                  cancelButton,
+                                  saveButton
+                                ],
+                              ),
+                            )
+                          ],
                         ),
                       ),
-                    )
-                    .toList(),
-                onChanged: (value) {
-                  if (value == null) {
-                    return;
-                  }
-                  setState(() {
-                    _selectedCategory = value;
-                  });
-                },
-              ),
-              const Spacer(),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('Cancel'),
-              ),
-              ElevatedButton(
-                onPressed: _submitExpenseData,
-                child: const Text('Save Expense'),
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
-        ],
-      ),
-    );
+        ),
+      );
+    });
   }
 }
